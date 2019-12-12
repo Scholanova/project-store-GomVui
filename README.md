@@ -1,6 +1,6 @@
 # Project STORE
 
-Il s'agit d'un projet d'API sur SpringBoot avec JDBC template.
+Il s'agit d'un projet d'API super bien sur SpringBoot avec JDBC template.
 On parle d'un projet de gestion d'inventaire de magasins. 
 
 ## Les étapes du projet : 
