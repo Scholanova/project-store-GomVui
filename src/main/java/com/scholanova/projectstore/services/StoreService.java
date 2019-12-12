@@ -1,5 +1,6 @@
 package com.scholanova.projectstore.services;
 
+import com.scholanova.projectstore.exceptions.ModelNotFoundException;
 import com.scholanova.projectstore.exceptions.StoreNameCannotBeEmptyException;
 import com.scholanova.projectstore.models.Store;
 import com.scholanova.projectstore.repositories.StoreRepository;
@@ -26,5 +27,9 @@ public class StoreService {
     private boolean isNameMissing(Store store) {
         return store.getName() == null ||
                 store.getName().trim().length() == 0;
+    }
+
+    public Store getStore(int id) throws ModelNotFoundException {
+        return storeRepository.getById(id);
     }
 }

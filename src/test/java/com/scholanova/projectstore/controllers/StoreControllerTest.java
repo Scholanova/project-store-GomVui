@@ -40,6 +40,9 @@ class StoreControllerTest {
     @Captor
     ArgumentCaptor<Store> createStoreArgumentCaptor;
 
+    @Captor
+    ArgumentCaptor<Integer> getStoreArgumentCaptor;
+
     @Nested
     class Test_createStore {
 
@@ -114,5 +117,75 @@ class StoreControllerTest {
             Store storeNotCreate = createStoreArgumentCaptor.getValue();
             assertThat(storeNotCreate == null);
         }
+    }
+
+    @Nested
+    class Test_getStore {
+
+        @Test
+        void givenExistingStoreId_whenCalled_getStore() throws Exception {
+            // given
+            String url = "http://localhost:{port}/stores/12";
+
+            Map<String, String> urlVariables = new HashMap<>();
+            urlVariables.put("port", String.valueOf(port));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+
+            Store returnedStore = new Store(12, "boulangerie");
+            when(storeService.getStore(getStoreArgumentCaptor.capture())).thenReturn(returnedStore);
+
+            // When
+            ResponseEntity responseEntity = template.exchange(url,
+                    HttpMethod.GET,
+                    httpEntity,
+                    String.class,
+                    urlVariables);
+
+            // Then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(OK);
+            assertThat(responseEntity.getBody()).isEqualTo(
+                    "{" +
+                            "\"id\":12," +
+                            "\"name\":\"boulangerie\"" +
+                            "}"
+            );
+            Integer storeToGet = getStoreArgumentCaptor.getValue();
+            assertThat(storeToGet).isEqualTo(12);
+        }
+
+//        @Test
+//        void givenNonExistingStoreId_whenCalled_getStore() throws Exception {
+//            // given
+//            String url = "http://localhost:{port}/stores/13";
+//
+//            Map<String, String> urlVariables = new HashMap<>();
+//            urlVariables.put("port", String.valueOf(port));
+//
+//            HttpHeaders headers = new HttpHeaders();
+//            headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+//
+//            when(storeService.getStore(getStoreArgumentCaptor.capture())).thenThrow(StoreIdNotFoundException.class);
+//
+//            // When
+//            ResponseEntity responseEntity = template.exchange(url,
+//                    HttpMethod.GET,
+//                    httpEntity,
+//                    String.class,
+//                    urlVariables);
+//
+//            // Then
+//            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+//            assertThat(responseEntity.getBody()).isEqualTo(
+//                    "{" +
+//                            "\"msg\":\"name cannot be empty\"" +
+//                            "}"
+//            );
+//        }
     }
 }

@@ -8,6 +8,7 @@ executors:
         environment:
           POSTGRES_USER: postgres
           POSTGRES_DB: scholanova_project_store
+          POSTGRES_PASSWORD: moramora
 
 jobs:
   test_java:

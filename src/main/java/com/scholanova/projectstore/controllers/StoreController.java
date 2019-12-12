@@ -1,13 +1,11 @@
 package com.scholanova.projectstore.controllers;
 
+import com.scholanova.projectstore.exceptions.ModelNotFoundException;
 import com.scholanova.projectstore.exceptions.StoreNameCannotBeEmptyException;
 import com.scholanova.projectstore.models.Store;
 import com.scholanova.projectstore.services.StoreService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,8 +20,8 @@ public class StoreController {
     }
 
     @GetMapping(path = "/stores/{id}")
-    public Store getStation() {
-        return null;
+    public Store getStation(@PathVariable int id) throws ModelNotFoundException {
+        return storeService.getStore(id);
     }
 
     @PostMapping(path = "/stores")
