@@ -1,5 +1,6 @@
 package com.scholanova.projectstore.controllers;
 
+import com.scholanova.projectstore.exceptions.StoreNameCannotBeEmptyException;
 import com.scholanova.projectstore.models.Store;
 import com.scholanova.projectstore.services.StoreService;
 import org.junit.jupiter.api.Nested;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 
 @ExtendWith(SpringExtension.class)
@@ -76,6 +78,41 @@ class StoreControllerTest {
             );
             Store storeToCreate = createStoreArgumentCaptor.getValue();
             assertThat(storeToCreate.getName()).isEqualTo("Boulangerie");
+        }
+
+        @Test
+        void givenEmptyBody_whenCalled_createsStore() throws Exception {
+            // given
+            String url = "http://localhost:{port}/stores";
+
+            Map<String, String> urlVariables = new HashMap<>();
+            urlVariables.put("port", String.valueOf(port));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            String requestJson = "{" +
+                    "\"name\":\"\"" +
+                    "}";
+            HttpEntity<String> httpEntity = new HttpEntity<>(requestJson, headers);
+
+            when(storeService.create(createStoreArgumentCaptor.capture())).thenThrow(StoreNameCannotBeEmptyException.class);
+
+            // When
+            ResponseEntity responseEntity = template.exchange(url,
+                    HttpMethod.POST,
+                    httpEntity,
+                    String.class,
+                    urlVariables);
+
+            // Then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+            assertThat(responseEntity.getBody()).isEqualTo(
+                    "{" +
+                        "\"msg\":\"name cannot be empty\"" +
+                    "}"
+            );
+            Store storeNotCreate = createStoreArgumentCaptor.getValue();
+            assertThat(storeNotCreate == null);
         }
     }
 }
