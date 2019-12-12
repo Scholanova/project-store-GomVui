@@ -1,6 +1,7 @@
 package com.scholanova.projectstore.repositories;
 
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
+import com.scholanova.projectstore.exceptions.StoreNotFoundException;
 import com.scholanova.projectstore.models.Store;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Nested;
@@ -73,6 +74,37 @@ class StoreRepositoryTest {
             // Then
             assertThat(createdStore.getId()).isNotNull();
             assertThat(createdStore.getName()).isEqualTo(storeName);
+        }
+    }
+
+    @Nested
+    class Test_deleteById {
+
+        @Test
+        void whenNoStoresWithThatId_thenThrowsException() throws Exception {
+            // Given
+            Integer id = 1000;
+
+            // When & Then
+            assertThrows(StoreNotFoundException.class, () -> {
+                storeRepository.deleteById(id);
+            });
+        }
+
+        @Test
+        void whenStoreExists_thenDeleteTheStore() throws Exception {
+            // Given
+            Integer id = 1;
+            Store store = new Store(id, "Carrefour");
+            insertStore(store);
+
+            // When
+            storeRepository.deleteById(id);
+
+            // Then
+            assertThrows(ModelNotFoundException.class, () -> {
+                storeRepository.getById(id);
+            });
         }
     }
 

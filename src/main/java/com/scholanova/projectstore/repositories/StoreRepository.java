@@ -1,6 +1,7 @@
 package com.scholanova.projectstore.repositories;
 
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
+import com.scholanova.projectstore.exceptions.StoreNotFoundException;
 import com.scholanova.projectstore.models.Store;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -56,6 +57,20 @@ public class StoreRepository {
             return this.getById(newlyCreatedId);
         } catch (ModelNotFoundException e) {
             return null;
+        }
+    }
+
+    public void deleteById(Integer id) throws StoreNotFoundException {
+
+        String query = "DELETE FROM STORES " +
+                "WHERE ID = :id ";
+
+        SqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("id", id);
+
+        int totalAffectedRows = jdbcTemplate.update(query, parameters);
+        if (totalAffectedRows == 0){
+            throw new StoreNotFoundException();
         }
     }
 }

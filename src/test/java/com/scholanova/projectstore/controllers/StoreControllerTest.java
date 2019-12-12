@@ -1,6 +1,7 @@
 package com.scholanova.projectstore.controllers;
 
 import com.scholanova.projectstore.exceptions.StoreNameCannotBeEmptyException;
+import com.scholanova.projectstore.exceptions.StoreNotFoundException;
 import com.scholanova.projectstore.models.Store;
 import com.scholanova.projectstore.services.StoreService;
 import org.junit.jupiter.api.Nested;
@@ -20,9 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.OK;
+import static org.mockito.Mockito.*;
+import static org.springframework.http.HttpStatus.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -187,5 +187,70 @@ class StoreControllerTest {
 //                            "}"
 //            );
 //        }
+    }
+
+    @Nested
+    class Test_deleteStore {
+
+        @Test
+        void givenExistingStoreId_whenCalled_deleteStore() throws Exception {
+            // given
+            String url = "http://localhost:{port}/stores/12";
+
+            Map<String, String> urlVariables = new HashMap<>();
+            urlVariables.put("port", String.valueOf(port));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+
+            doNothing().when(storeService).deleteStoreById(getStoreArgumentCaptor.capture());
+
+            // When
+            ResponseEntity responseEntity = template.exchange(url,
+                    HttpMethod.DELETE,
+                    httpEntity,
+                    String.class,
+                    urlVariables);
+
+            // Then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(NO_CONTENT);
+
+            Integer storeIdToDelete = getStoreArgumentCaptor.getValue();
+            assertThat(storeIdToDelete).isEqualTo(12);
+        }
+
+        @Test
+        void givenNonExistingStoreId_whenCalled_deleteStore() throws Exception {
+            // given
+            String url = "http://localhost:{port}/stores/13";
+
+            Map<String, String> urlVariables = new HashMap<>();
+            urlVariables.put("port", String.valueOf(port));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+
+            doThrow(new StoreNotFoundException()).when(storeService).deleteStoreById(13);
+
+            // When
+            ResponseEntity responseEntity = template.exchange(url,
+                    HttpMethod.DELETE,
+                    httpEntity,
+                    String.class,
+                    urlVariables);
+
+            // Then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+            assertThat(responseEntity.getBody()).isEqualTo(
+                    "{" +
+                        "\"msg\":\"store not found\"" +
+                    "}"
+            );
+            verify(storeService).deleteStoreById(13);
+        }
     }
 }

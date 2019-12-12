@@ -2,9 +2,11 @@ package com.scholanova.projectstore.services;
 
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
 import com.scholanova.projectstore.exceptions.StoreNameCannotBeEmptyException;
+import com.scholanova.projectstore.exceptions.StoreNotFoundException;
 import com.scholanova.projectstore.models.Store;
 import com.scholanova.projectstore.repositories.StoreRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 @Service
 public class StoreService {
@@ -31,5 +33,9 @@ public class StoreService {
 
     public Store getStore(int id) throws ModelNotFoundException {
         return storeRepository.getById(id);
+    }
+
+    public void deleteStoreById(int id) throws StoreNotFoundException {
+        storeRepository.deleteById(id);
     }
 }
