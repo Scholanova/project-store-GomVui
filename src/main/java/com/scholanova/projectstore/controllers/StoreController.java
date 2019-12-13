@@ -23,10 +23,13 @@ public class StoreController {
     @GetMapping(path = "/stores/{id}")
     public ResponseEntity<?> getStation(@PathVariable int id) throws ModelNotFoundException {
         try {
+            Store calledStore = storeService.getStore(id);
             return ResponseEntity.ok()
-                    .body(storeService.getStore(id));
+                    .body(calledStore);
         }catch (ModelNotFoundException ex) {
-            return ResponseEntity.status(400).body("store not found");
+            Map<String, String> erroMsg = new HashMap<>();
+            erroMsg.put("msg", "store not found");
+            return ResponseEntity.status(400).body(erroMsg);
         }
     }
 

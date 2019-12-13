@@ -1,5 +1,6 @@
 package com.scholanova.projectstore.controllers;
 
+import com.scholanova.projectstore.exceptions.ModelNotFoundException;
 import com.scholanova.projectstore.exceptions.StoreNameCannotBeEmptyException;
 import com.scholanova.projectstore.exceptions.StoreNotFoundException;
 import com.scholanova.projectstore.models.Store;
@@ -157,36 +158,37 @@ class StoreControllerTest {
             assertThat(storeToGet).isEqualTo(12);
         }
 
-//        @Test
-//        void givenNonExistingStoreId_whenCalled_getStore() throws Exception {
-//            // given
-//            String url = "http://localhost:{port}/stores/13";
-//
-//            Map<String, String> urlVariables = new HashMap<>();
-//            urlVariables.put("port", String.valueOf(port));
-//
-//            HttpHeaders headers = new HttpHeaders();
-//            headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
-//
-//            when(storeService.getStore(getStoreArgumentCaptor.capture())).thenThrow(StoreIdNotFoundException.class);
-//
-//            // When
-//            ResponseEntity responseEntity = template.exchange(url,
-//                    HttpMethod.GET,
-//                    httpEntity,
-//                    String.class,
-//                    urlVariables);
-//
-//            // Then
-//            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
-//            assertThat(responseEntity.getBody()).isEqualTo(
-//                    "{" +
-//                            "\"msg\":\"name cannot be empty\"" +
-//                            "}"
-//            );
-//        }
+        @Test
+        void givenNonExistingStoreId_whenCalled_getStore() throws Exception {
+            // given
+            String url = "http://localhost:{port}/stores/13";
+
+            Map<String, String> urlVariables = new HashMap<>();
+            urlVariables.put("port", String.valueOf(port));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+
+            doThrow(new ModelNotFoundException()).when(storeService).getStore(13);
+
+            // When
+            ResponseEntity responseEntity = template.exchange(url,
+                    HttpMethod.GET,
+                    httpEntity,
+                    String.class,
+                    urlVariables);
+
+            // Then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+            assertThat(responseEntity.getBody()).isEqualTo(
+                    "{" +
+                            "\"msg\":\"store not found\"" +
+                            "}"
+            );
+            verify(storeService).getStore(13);
+        }
     }
 
     @Nested
