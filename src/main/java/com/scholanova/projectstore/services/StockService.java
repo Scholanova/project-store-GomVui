@@ -22,7 +22,7 @@ public class StockService {
     }
 
     private void verifyStock(Stock stock) throws StockNotValidException {
-        if (!stock.getType().equals("Fruit") || !stock.getType().equals("Nail")) {
+        if (!stock.getType().equals("Fruit") && !stock.getType().equals("Nail")) {
             throw new StockNotValidException();
         }
 

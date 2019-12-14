@@ -1,4 +1,4 @@
 package com.scholanova.projectstore.exceptions;
 
-public class StockNotValidException extends Throwable {
+public class StockNotValidException extends Exception {
 }

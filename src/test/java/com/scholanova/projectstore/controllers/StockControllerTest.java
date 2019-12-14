@@ -8,11 +8,14 @@ import com.scholanova.projectstore.models.Store;
 import com.scholanova.projectstore.models.Stock;
 import com.scholanova.projectstore.services.StockService;
 import com.scholanova.projectstore.services.StoreService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -115,8 +118,7 @@ public class StockControllerTest {
                     "}";
             HttpEntity<String> httpEntity = new HttpEntity<>(requestJson, headers);
 
-            Stock createdStock = new Stock(1, "", "Nail", 100, 1);
-            when(stockService.create(1, createdStock)).thenThrow(StockNotValidException.class);
+            when(stockService.create(storeIdArgumentCaptor.capture(),createStockArgumentCaptor.capture())).thenThrow(StockNotValidException.class);
 
             // When
             ResponseEntity responseEntity = template.exchange(url,
@@ -132,8 +134,8 @@ public class StockControllerTest {
                             "\"msg\":\"Invalid stock\"" +
                             "}"
             );
-
-            verify(stockService).create(1, createdStock);
+            Stock stockToCreate = createStockArgumentCaptor.getValue();
+            assertThat(stockToCreate.getName()).isEqualTo("");
         }
 
         @Test
@@ -155,8 +157,7 @@ public class StockControllerTest {
                     "}";
             HttpEntity<String> httpEntity = new HttpEntity<>(requestJson, headers);
 
-            Stock createdStock = new Stock(1, "salut", "Nail", 0, 1);
-            when(stockService.create(1, createdStock)).thenThrow(StockNotValidException.class);
+            when(stockService.create(storeIdArgumentCaptor.capture(),createStockArgumentCaptor.capture())).thenThrow(StockNotValidException.class);
 
             // When
             ResponseEntity responseEntity = template.exchange(url,
@@ -166,14 +167,17 @@ public class StockControllerTest {
                     urlVariables);
 
             // Then
-            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
             assertThat(responseEntity.getBody()).isEqualTo(
                     "{" +
                             "\"msg\":\"Invalid stock\"" +
                             "}"
             );
+            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
 
-            verify(stockService).create(1, createdStock);
+            Stock stockToCreate = createStockArgumentCaptor.getValue();
+            assertThat(stockToCreate.getName()).isEqualTo("salut");
+            assertThat(stockToCreate.getValue()).isEqualTo(0);
+            assertThat(storeIdArgumentCaptor.getValue()).isEqualTo(1);
         }
 
         @Test
@@ -195,8 +199,7 @@ public class StockControllerTest {
                     "}";
             HttpEntity<String> httpEntity = new HttpEntity<>(requestJson, headers);
 
-            Stock createdStock = new Stock(1, "salut", "Fruits", 10, 1);
-            when(stockService.create(1, createdStock)).thenThrow(StockNotValidException.class);
+            when(stockService.create(storeIdArgumentCaptor.capture(),createStockArgumentCaptor.capture())).thenThrow(StockNotValidException.class);
 
             // When
             ResponseEntity responseEntity = template.exchange(url,
@@ -212,8 +215,10 @@ public class StockControllerTest {
                             "\"msg\":\"Invalid stock\"" +
                             "}"
             );
+            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
 
-            verify(stockService).create(1, createdStock);
+            Stock stockToCreate = createStockArgumentCaptor.getValue();
+            assertThat(stockToCreate.getType()).isEqualTo("Fruits");
         }
     }
 }

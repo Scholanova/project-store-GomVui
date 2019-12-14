@@ -1,6 +1,7 @@
 package com.scholanova.projectstore.repositories;
 
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
+import com.scholanova.projectstore.exceptions.StockNotValidException;
 import com.scholanova.projectstore.exceptions.StoreNotFoundException;
 import com.scholanova.projectstore.models.Stock;
 import com.scholanova.projectstore.models.Store;

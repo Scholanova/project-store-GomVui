@@ -85,7 +85,7 @@ class StoreControllerTest {
         }
 
         @Test
-        void givenEmptyBody_whenCalled_createsStore() throws Exception {
+        void givenEmptyBody_whenCalled_doNotCreateStore() throws Exception {
             // given
             String url = "http://localhost:{port}/stores";
 
