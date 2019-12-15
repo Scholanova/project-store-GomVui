@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -47,6 +48,11 @@ public class StockControllerTest {
 
     @Captor
     ArgumentCaptor<Stock> createStockArgumentCaptor;
+
+    @AfterEach
+    public void reset_mocks() {
+        Mockito.reset(stockService);
+    }
 
     @Captor
     ArgumentCaptor<Integer> storeIdArgumentCaptor;
