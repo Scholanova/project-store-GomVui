@@ -115,4 +115,17 @@ public class StockRepository {
         }
     }
 
+    public void deleteById(Integer id) throws StockNotValidException {
+
+        String query = "DELETE FROM STOCK " +
+                "WHERE ID = :id ";
+
+        SqlParameterSource parameters = new MapSqlParameterSource()
+                .addValue("id", id);
+
+        int totalAffectedRows = jdbcTemplate.update(query, parameters);
+        if (totalAffectedRows == 0){
+            throw new StockNotValidException();
+        }
+    }
 }

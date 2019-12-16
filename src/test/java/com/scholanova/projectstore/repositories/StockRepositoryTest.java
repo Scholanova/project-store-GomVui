@@ -1,6 +1,7 @@
 package com.scholanova.projectstore.repositories;
 
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
+import com.scholanova.projectstore.exceptions.StockNotValidException;
 import com.scholanova.projectstore.models.Store;
 import com.scholanova.projectstore.models.Stock;
 import org.junit.jupiter.api.AfterEach;
@@ -199,6 +200,39 @@ public class StockRepositoryTest {
             // Then
             assertThat(createdStock.getId()).isNotNull();
             assertThat(createdStock.getName()).isEqualTo(stock.getName());
+        }
+    }
+
+    @Nested
+    class Test_deleteById {
+
+        @Test
+        void whenNoStockWithThatId_thenThrowsException() throws Exception {
+            // Given
+            Integer id = 1000;
+
+            // When & Then
+            assertThrows(StockNotValidException.class, () -> {
+                stockRepository.deleteById(id);
+            });
+        }
+
+        @Test
+        void whenStockExists_thenDeleteTheStock() throws Exception {
+            // Given
+            Store store = new Store(1, "Carrefour");
+            insertStore(store);
+            int stockId = 1;
+            Stock stock = new Stock(stockId, "Poire", "Fruit", 50, 1);
+            insertStock(stock);
+
+            // When
+            stockRepository.deleteById(stockId);
+
+            // Then
+            assertThrows(ModelNotFoundException.class, () -> {
+                stockRepository.getById(stockId);
+            });
         }
     }
 

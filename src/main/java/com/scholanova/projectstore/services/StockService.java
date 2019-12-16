@@ -27,6 +27,10 @@ public class StockService {
         return stockRepository.listStocksByStoreId(storeId);
     }
 
+    public void deleteStoreById(int id) throws StockNotValidException {
+        stockRepository.deleteById(id);
+    }
+
     private void verifyStock(Stock stock) throws StockNotValidException {
         if (!stock.getType().equals("Fruit") && !stock.getType().equals("Nail")) {
             throw new StockNotValidException();
