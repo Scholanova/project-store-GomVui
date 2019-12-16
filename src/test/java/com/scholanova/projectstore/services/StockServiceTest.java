@@ -18,6 +18,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.jdbc.JdbcTestUtils;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -125,6 +127,20 @@ public class StockServiceTest {
 
         // THEN
         verify(stockRepository).addStockByStoreId(1, validStock);
+    }
+
+    @Test
+    void givenExistingStore_returnListOfStock() throws ModelNotFoundException {
+        //GIVEN
+
+        Store mockedStore = new Store(1, "carrefour");
+        insertStore(mockedStore);
+
+        //WHEN
+        List listStock = stockService.listStock(1);
+
+        //THEN
+        verify(stockRepository).listStocksByStoreId(1);
     }
 
     private void insertStore(Store store) {

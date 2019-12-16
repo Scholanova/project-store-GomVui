@@ -6,6 +6,8 @@ import com.scholanova.projectstore.models.Stock;
 import com.scholanova.projectstore.repositories.StockRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class StockService {
 
@@ -19,6 +21,10 @@ public class StockService {
         verifyStock(stock);
 
         return stockRepository.addStockByStoreId(storeId, stock);
+    }
+
+    public List<Stock> listStock(int storeId) throws ModelNotFoundException {
+        return stockRepository.listStocksByStoreId(storeId);
     }
 
     private void verifyStock(Stock stock) throws StockNotValidException {

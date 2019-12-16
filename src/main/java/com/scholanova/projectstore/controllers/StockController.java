@@ -33,4 +33,16 @@ public class StockController {
         }
     }
 
+    @GetMapping(path = "/stores/{storeId}/stocks")
+    public ResponseEntity<?> listStock(@PathVariable int storeId) {
+        try {
+            return ResponseEntity.ok()
+                    .body(stockService.listStock(storeId));
+        }catch (ModelNotFoundException ex) {
+            Map<String, String> erroMsg = new HashMap<>();
+            erroMsg.put("msg", "Store not found");
+            return ResponseEntity.status(400).body(erroMsg);
+        }
+    }
+
 }
