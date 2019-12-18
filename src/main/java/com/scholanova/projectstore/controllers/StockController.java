@@ -1,8 +1,10 @@
 package com.scholanova.projectstore.controllers;
 
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
+import com.scholanova.projectstore.exceptions.StockNotFoundException;
 import com.scholanova.projectstore.exceptions.StockNotValidException;
 
+import com.scholanova.projectstore.exceptions.StoreNotFoundException;
 import com.scholanova.projectstore.models.Stock;
 import com.scholanova.projectstore.services.StockService;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +43,18 @@ public class StockController {
         }catch (ModelNotFoundException ex) {
             Map<String, String> erroMsg = new HashMap<>();
             erroMsg.put("msg", "Store not found");
+            return ResponseEntity.status(400).body(erroMsg);
+        }
+    }
+
+    @DeleteMapping(path = "/stocks/{stockId}")
+    public ResponseEntity<?> deleteStock(@PathVariable int stockId) {
+        try {
+            stockService.deleteStockById(stockId);
+            return ResponseEntity.status(204).body(null);
+        }catch (StockNotFoundException ex) {
+            Map<String, String> erroMsg = new HashMap<>();
+            erroMsg.put("msg", "stock not found");
             return ResponseEntity.status(400).body(erroMsg);
         }
     }

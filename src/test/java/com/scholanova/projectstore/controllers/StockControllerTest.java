@@ -1,6 +1,7 @@
 package com.scholanova.projectstore.controllers;
 
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
+import com.scholanova.projectstore.exceptions.StockNotFoundException;
 import com.scholanova.projectstore.exceptions.StockNotValidException;
 import com.scholanova.projectstore.models.Store;
 import com.scholanova.projectstore.models.Stock;
@@ -52,6 +53,9 @@ public class StockControllerTest {
 
     @Captor
     ArgumentCaptor<Integer> storeIdArgumentCaptor;
+
+    @Captor
+    ArgumentCaptor<Integer> stockIdArgumentCaptor;
 
     @Nested
     class Test_createStock {
@@ -308,6 +312,71 @@ public class StockControllerTest {
                     "}"
             );
             verify(stockService).listStock(1);
+        }
+    }
+
+    @Nested
+    class Test_deleteStock {
+
+        @Test
+        void givenExistingStockId_whenCalled_deleteStock() throws Exception {
+            // given
+            String url = "http://localhost:{port}/stocks/1";
+
+            Map<String, String> urlVariables = new HashMap<>();
+            urlVariables.put("port", String.valueOf(port));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+
+            doNothing().when(stockService).deleteStockById(stockIdArgumentCaptor.capture());
+
+            // When
+            ResponseEntity responseEntity = template.exchange(url,
+                    HttpMethod.DELETE,
+                    httpEntity,
+                    String.class,
+                    urlVariables);
+
+            // Then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(NO_CONTENT);
+            assertThat(responseEntity.getBody()).isEqualTo(null);
+            int stockIdDeleted = stockIdArgumentCaptor.getValue();
+            assertThat(stockIdDeleted).isEqualTo(1);
+        }
+
+        @Test
+        void givenNonExistantStockId_whenCalled_getException() throws Exception {
+            // given
+            String url = "http://localhost:{port}/stocks/13";
+
+            Map<String, String> urlVariables = new HashMap<>();
+            urlVariables.put("port", String.valueOf(port));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+
+            doThrow(new StockNotFoundException()).when(stockService).deleteStockById(13);
+
+            // When
+            ResponseEntity responseEntity = template.exchange(url,
+                    HttpMethod.DELETE,
+                    httpEntity,
+                    String.class,
+                    urlVariables);
+
+            // Then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+            assertThat(responseEntity.getBody()).isEqualTo(
+                    "{" +
+                            "\"msg\":\"stock not found\"" +
+                            "}"
+            );
+            verify(stockService).deleteStockById(13);
         }
     }
 }

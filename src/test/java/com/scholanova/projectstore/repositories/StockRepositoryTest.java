@@ -1,6 +1,7 @@
 package com.scholanova.projectstore.repositories;
 
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
+import com.scholanova.projectstore.exceptions.StockNotFoundException;
 import com.scholanova.projectstore.exceptions.StockNotValidException;
 import com.scholanova.projectstore.models.Store;
 import com.scholanova.projectstore.models.Stock;
@@ -212,7 +213,7 @@ public class StockRepositoryTest {
             Integer id = 1000;
 
             // When & Then
-            assertThrows(StockNotValidException.class, () -> {
+            assertThrows(StockNotFoundException.class, () -> {
                 stockRepository.deleteById(id);
             });
         }

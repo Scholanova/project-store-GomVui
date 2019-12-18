@@ -1,6 +1,7 @@
 package com.scholanova.projectstore.services;
 
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
+import com.scholanova.projectstore.exceptions.StockNotFoundException;
 import com.scholanova.projectstore.exceptions.StockNotValidException;
 import com.scholanova.projectstore.models.Stock;
 import com.scholanova.projectstore.repositories.StockRepository;
@@ -27,8 +28,8 @@ public class StockService {
         return stockRepository.listStocksByStoreId(storeId);
     }
 
-    public void deleteStoreById(int id) throws StockNotValidException {
-        stockRepository.deleteById(id);
+    public void deleteStockById(int stockId) throws StockNotFoundException {
+        stockRepository.deleteById(stockId);
     }
 
     private void verifyStock(Stock stock) throws StockNotValidException {

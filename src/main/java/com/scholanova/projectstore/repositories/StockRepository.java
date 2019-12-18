@@ -1,6 +1,7 @@
 package com.scholanova.projectstore.repositories;
 
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
+import com.scholanova.projectstore.exceptions.StockNotFoundException;
 import com.scholanova.projectstore.exceptions.StockNotValidException;
 import com.scholanova.projectstore.exceptions.StoreNotFoundException;
 import com.scholanova.projectstore.models.Stock;
@@ -115,7 +116,7 @@ public class StockRepository {
         }
     }
 
-    public void deleteById(Integer id) throws StockNotValidException {
+    public void deleteById(Integer id) throws StockNotFoundException {
 
         String query = "DELETE FROM STOCK " +
                 "WHERE ID = :id ";
@@ -125,7 +126,7 @@ public class StockRepository {
 
         int totalAffectedRows = jdbcTemplate.update(query, parameters);
         if (totalAffectedRows == 0){
-            throw new StockNotValidException();
+            throw new StockNotFoundException();
         }
     }
 }
