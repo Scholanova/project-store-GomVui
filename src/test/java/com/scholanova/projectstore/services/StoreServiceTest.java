@@ -2,6 +2,7 @@ package com.scholanova.projectstore.services;
 
 import com.scholanova.projectstore.exceptions.StoreNameCannotBeEmptyException;
 import com.scholanova.projectstore.models.Store;
+import com.scholanova.projectstore.repositories.StockRepository;
 import com.scholanova.projectstore.repositories.StoreRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,9 +22,12 @@ class StoreServiceTest {
     @Mock
     private StoreRepository storeRepository;
 
+    @Mock
+    private StockRepository stockRepository;
+
     @BeforeEach
     void setUp() {
-        storeService = new StoreService(storeRepository);
+        storeService = new StoreService(storeRepository, stockRepository);
     }
 
     @Test

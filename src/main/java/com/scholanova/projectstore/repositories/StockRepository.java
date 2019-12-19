@@ -129,4 +129,16 @@ public class StockRepository {
             throw new StockNotFoundException();
         }
     }
+
+    public Integer getStoreTotalValue(Integer storeId) {
+        String query = "SELECT SUM(value) total FROM stock WHERE storeid = :id ";
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("id", storeId);
+
+        if(jdbcTemplate.queryForObject(query, parameters, Integer.class) == null) {
+            return 0;
+        }
+        return jdbcTemplate.queryForObject(query, parameters, Integer.class);
+    }
 }

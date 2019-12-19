@@ -4,6 +4,8 @@ import com.scholanova.projectstore.exceptions.ModelNotFoundException;
 import com.scholanova.projectstore.exceptions.StoreNameCannotBeEmptyException;
 import com.scholanova.projectstore.exceptions.StoreNotFoundException;
 import com.scholanova.projectstore.models.Store;
+import com.scholanova.projectstore.models.StoreWithTotalValue;
+import com.scholanova.projectstore.services.StockService;
 import com.scholanova.projectstore.services.StoreService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,15 +23,15 @@ public class StoreController {
     }
 
     @GetMapping(path = "/stores/{id}")
-    public ResponseEntity<?> getStation(@PathVariable int id) throws ModelNotFoundException {
+    public ResponseEntity<?> getStation(@PathVariable int id) {
         try {
-            Store calledStore = storeService.getStore(id);
+            StoreWithTotalValue store = storeService.getStore(id);
             return ResponseEntity.ok()
-                    .body(calledStore);
+                    .body(store);
         }catch (ModelNotFoundException ex) {
             Map<String, String> erroMsg = new HashMap<>();
             erroMsg.put("msg", "store not found");
-            return ResponseEntity.status(400).body(erroMsg);
+            return ResponseEntity.status(404).body(erroMsg);
         }
     }
 

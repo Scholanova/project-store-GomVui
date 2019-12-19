@@ -4,6 +4,7 @@ import com.scholanova.projectstore.exceptions.ModelNotFoundException;
 import com.scholanova.projectstore.exceptions.StoreNameCannotBeEmptyException;
 import com.scholanova.projectstore.exceptions.StoreNotFoundException;
 import com.scholanova.projectstore.models.Store;
+import com.scholanova.projectstore.models.StoreWithTotalValue;
 import com.scholanova.projectstore.services.StoreService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -136,7 +137,7 @@ class StoreControllerTest {
 
             HttpEntity<String> httpEntity = new HttpEntity<>(headers);
 
-            Store returnedStore = new Store(12, "boulangerie");
+            StoreWithTotalValue returnedStore = new StoreWithTotalValue(12, "boulangerie", 12);
             when(storeService.getStore(getStoreArgumentCaptor.capture())).thenReturn(returnedStore);
 
             // When
@@ -151,7 +152,8 @@ class StoreControllerTest {
             assertThat(responseEntity.getBody()).isEqualTo(
                     "{" +
                             "\"id\":12," +
-                            "\"name\":\"boulangerie\"" +
+                            "\"name\":\"boulangerie\"," +
+                            "\"stockTotalValue\":12" +
                             "}"
             );
             Integer storeToGet = getStoreArgumentCaptor.getValue();
@@ -181,7 +183,7 @@ class StoreControllerTest {
                     urlVariables);
 
             // Then
-            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+            assertThat(responseEntity.getStatusCode()).isEqualTo(NOT_FOUND);
             assertThat(responseEntity.getBody()).isEqualTo(
                     "{" +
                             "\"msg\":\"store not found\"" +

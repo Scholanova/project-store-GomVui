@@ -3,6 +3,7 @@ package com.scholanova.projectstore.repositories;
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
 import com.scholanova.projectstore.exceptions.StockNotFoundException;
 import com.scholanova.projectstore.exceptions.StockNotValidException;
+import com.scholanova.projectstore.exceptions.StoreNotFoundException;
 import com.scholanova.projectstore.models.Store;
 import com.scholanova.projectstore.models.Stock;
 import org.junit.jupiter.api.AfterEach;
@@ -234,6 +235,42 @@ public class StockRepositoryTest {
             assertThrows(ModelNotFoundException.class, () -> {
                 stockRepository.getById(stockId);
             });
+        }
+    }
+
+    @Nested
+    class Test_getStoreTotalValue {
+
+        @Test
+        void whenGivenExistingStoreWithStock_thenReturnStockTotalValue() throws ModelNotFoundException {
+            // Given
+            int mockedStoreId = 5;
+            Store mockedStore = new Store(mockedStoreId, "Auchan");
+            insertStore(mockedStore);
+            Stock mockedStock = new Stock(1, "Poire", "Fruit", 50, 5);
+            insertStock(mockedStock);
+            Stock mockedStock2 = new Stock(2, "Pomme", "Fruit", 55, 5);
+            insertStock(mockedStock2);
+
+            // When
+            int totalStoreValue = stockRepository.getStoreTotalValue(mockedStoreId);
+
+            // Then
+            assertThat(totalStoreValue).isEqualTo(105);
+        }
+
+        @Test
+        void whenGivenExistingStoreWithoutStock_thenReturnStockTotalValue() throws ModelNotFoundException {
+            // Given
+            int mockedStoreId = 5;
+            Store mockedStore = new Store(mockedStoreId, "Auchan");
+            insertStore(mockedStore);
+
+            // When
+            Integer totalStoreValue = stockRepository.getStoreTotalValue(mockedStoreId);
+
+            // Then
+            assertThat(totalStoreValue).isEqualTo(0);
         }
     }
 
