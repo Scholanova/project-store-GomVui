@@ -248,7 +248,7 @@ class StoreControllerTest {
                     urlVariables);
 
             // Then
-            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+            assertThat(responseEntity.getStatusCode()).isEqualTo(NOT_FOUND);
             assertThat(responseEntity.getBody()).isEqualTo(
                     "{" +
                         "\"msg\":\"store not found\"" +

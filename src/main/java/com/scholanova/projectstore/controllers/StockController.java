@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class StockController {
@@ -36,14 +37,14 @@ public class StockController {
     }
 
     @GetMapping(path = "/stores/{storeId}/stocks")
-    public ResponseEntity<?> listStock(@PathVariable int storeId) {
+    public ResponseEntity<?> listStock(@PathVariable int storeId, @RequestParam Optional<String> type) {
         try {
             return ResponseEntity.ok()
-                    .body(stockService.listStock(storeId));
+                    .body(stockService.getStoreStockByType(storeId, type.orElse("")));
         }catch (ModelNotFoundException ex) {
             Map<String, String> erroMsg = new HashMap<>();
             erroMsg.put("msg", "Store not found");
-            return ResponseEntity.status(400).body(erroMsg);
+            return ResponseEntity.status(404).body(erroMsg);
         }
     }
 
@@ -55,7 +56,7 @@ public class StockController {
         }catch (StockNotFoundException ex) {
             Map<String, String> erroMsg = new HashMap<>();
             erroMsg.put("msg", "stock not found");
-            return ResponseEntity.status(400).body(erroMsg);
+            return ResponseEntity.status(404).body(erroMsg);
         }
     }
 

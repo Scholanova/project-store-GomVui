@@ -3,7 +3,6 @@ package com.scholanova.projectstore.controllers;
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
 import com.scholanova.projectstore.exceptions.StockNotFoundException;
 import com.scholanova.projectstore.exceptions.StockNotValidException;
-import com.scholanova.projectstore.models.Store;
 import com.scholanova.projectstore.models.Stock;
 import com.scholanova.projectstore.services.StockService;
 import org.junit.jupiter.api.AfterEach;
@@ -45,6 +44,9 @@ public class StockControllerTest {
 
     @Captor
     ArgumentCaptor<Stock> createStockArgumentCaptor;
+
+    @Captor
+    ArgumentCaptor<String> stockTypeArgumentCaptor;
 
     @AfterEach
     public void reset_mocks() {
@@ -250,7 +252,7 @@ public class StockControllerTest {
             stockList.add(createdStock);
             stockList.add(createdStock2);
 
-            when(stockService.listStock(storeIdArgumentCaptor.capture())).thenReturn(stockList);
+            when(stockService.getStoreStockByType(storeIdArgumentCaptor.capture(), stockTypeArgumentCaptor.capture())).thenReturn(stockList);
 
             // When
             ResponseEntity<String> responseEntity = template.exchange(url,
@@ -295,7 +297,7 @@ public class StockControllerTest {
 
             HttpEntity<String> httpEntity = new HttpEntity<>(headers);
 
-            when(stockService.listStock(1)).thenThrow(ModelNotFoundException.class);
+            when(stockService.getStoreStockByType(1, "")).thenThrow(ModelNotFoundException.class);
 
             // When
             ResponseEntity<String> responseEntity = template.exchange(url,
@@ -305,13 +307,65 @@ public class StockControllerTest {
                     urlVariables);
 
             // Then
-            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+            assertThat(responseEntity.getStatusCode()).isEqualTo(NOT_FOUND);
             assertThat(responseEntity.getBody()).isEqualTo(
                     "{" +
                             "\"msg\":\"Store not found\"" +
                     "}"
             );
-            verify(stockService).listStock(1);
+            verify(stockService).getStoreStockByType(1, "");
+        }
+
+        @Test
+        void givenCorrectStoreIdWithTypeParam_whenCalled_getListStock() throws Exception {
+            // given
+            String url = "http://localhost:{port}/stores/1/stocks?type=Nail";
+
+            Map<String, String> urlVariables = new HashMap<>();
+            urlVariables.put("port", String.valueOf(port));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> httpEntity = new HttpEntity<>(headers);
+
+            Stock createdStock = new Stock(1, "Flat Nail", "Nail", 100, 1);
+            Stock createdStock2 = new Stock(1, "Not Flat Nail", "Nail", 100, 1);
+            List<Stock> stockList = new ArrayList<>();
+            stockList.add(createdStock);
+            stockList.add(createdStock2);
+
+            when(stockService.getStoreStockByType(storeIdArgumentCaptor.capture(), stockTypeArgumentCaptor.capture())).thenReturn(stockList);
+
+            // When
+            ResponseEntity<String> responseEntity = template.exchange(url,
+                    HttpMethod.GET,
+                    httpEntity,
+                    String.class,
+                    urlVariables);
+
+            // Then
+            assertThat(responseEntity.getStatusCode()).isEqualTo(OK);
+            assertThat(responseEntity.getBody()).isEqualTo(
+                    "[" +
+                            "{" +
+                            "\"id\":1," +
+                            "\"name\":\"Flat Nail\"," +
+                            "\"type\":\"Nail\"," +
+                            "\"value\":100," +
+                            "\"storeId\":1" +
+                            "}," +
+                            "{" +
+                            "\"id\":1," +
+                            "\"name\":\"Not Flat Nail\"," +
+                            "\"type\":\"Nail\"," +
+                            "\"value\":100," +
+                            "\"storeId\":1" +
+                            "}" +
+                            "]"
+            );
+            assertThat(storeIdArgumentCaptor.getValue()).isEqualTo(1);
+            assertThat(stockTypeArgumentCaptor.getValue()).isEqualTo("Nail");
         }
     }
 
@@ -370,7 +424,7 @@ public class StockControllerTest {
                     urlVariables);
 
             // Then
-            assertThat(responseEntity.getStatusCode()).isEqualTo(BAD_REQUEST);
+            assertThat(responseEntity.getStatusCode()).isEqualTo(NOT_FOUND);
             assertThat(responseEntity.getBody()).isEqualTo(
                     "{" +
                             "\"msg\":\"stock not found\"" +

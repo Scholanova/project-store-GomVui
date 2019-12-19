@@ -141,4 +141,29 @@ public class StockRepository {
         }
         return jdbcTemplate.queryForObject(query, parameters, Integer.class);
     }
+
+    public List<Stock> getStoreStockByType(Integer storeId, String type) throws ModelNotFoundException {
+        String query = "SELECT ID as id, " +
+                "NAME AS name, " +
+                "TYPE AS type, " +
+                "VALUE AS value, " +
+                "STOREID AS storeId " +
+                "FROM STOCK " +
+                "WHERE storeId = :storeId AND type = :type";
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("storeId", storeId);
+        parameters.put("type", type);
+
+        List<Stock> stocks = jdbcTemplate.query(query,
+                parameters,
+                new BeanPropertyRowMapper<>(Stock.class));
+
+        if (stocks.isEmpty()) {
+            throw new ModelNotFoundException();
+        }
+        return jdbcTemplate.query(query,
+                parameters,
+                new BeanPropertyRowMapper<>(Stock.class));
+    }
 }

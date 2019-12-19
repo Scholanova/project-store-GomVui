@@ -24,8 +24,11 @@ public class StockService {
         return stockRepository.addStockByStoreId(storeId, stock);
     }
 
-    public List<Stock> listStock(int storeId) throws ModelNotFoundException {
-        return stockRepository.listStocksByStoreId(storeId);
+    public List<Stock> getStoreStockByType(int storeId, String type) throws ModelNotFoundException {
+        if(type.equals("Nail") || type.equals("Fruit")) {
+            return stockRepository.getStoreStockByType(storeId, type);
+        }
+        return  stockRepository.listStocksByStoreId(storeId);
     }
 
     public void deleteStockById(int stockId) throws StockNotFoundException {

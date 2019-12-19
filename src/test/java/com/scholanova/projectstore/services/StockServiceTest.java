@@ -2,11 +2,9 @@ package com.scholanova.projectstore.services;
 
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
 import com.scholanova.projectstore.exceptions.StockNotValidException;
-import com.scholanova.projectstore.exceptions.StoreNameCannotBeEmptyException;
 import com.scholanova.projectstore.models.Stock;
 import com.scholanova.projectstore.models.Store;
 import com.scholanova.projectstore.repositories.StockRepository;
-import com.scholanova.projectstore.repositories.StoreRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -137,7 +135,7 @@ public class StockServiceTest {
         insertStore(mockedStore);
 
         //WHEN
-        List listStock = stockService.listStock(1);
+        List listStock = stockService.getStoreStockByType(1, "");
 
         //THEN
         verify(stockRepository).listStocksByStoreId(1);

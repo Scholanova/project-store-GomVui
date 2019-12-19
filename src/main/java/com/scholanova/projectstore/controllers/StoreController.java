@@ -43,7 +43,7 @@ public class StoreController {
         }catch (StoreNotFoundException ex) {
             Map<String, String> erroMsg = new HashMap<>();
             erroMsg.put("msg", "store not found");
-            return ResponseEntity.status(400).body(erroMsg);
+            return ResponseEntity.status(404).body(erroMsg);
         }
     }
 

@@ -98,18 +98,14 @@ public class StockRepositoryTest {
             Stock stock2 = new Stock(stock2Id, "Pomme", "Fruit", 49, storeId);
             insertStock(stock2);
 
-            ArrayList mockedList = new ArrayList();
-            mockedList.add(stock);
-            mockedList.add(stock2);
-
             // When
             List<Stock> extractedStocks = stockRepository.listStocksByStoreId(storeId);
 
             // Then
             assertThat(extractedStocks).isNotEmpty();
-            assertThat(mockedList.size()).isEqualTo(2);
-            assertThat(mockedList.contains(stock));
-            assertThat(mockedList.contains(stock2));
+            assertThat(extractedStocks.size()).isEqualTo(2);
+            assertThat(extractedStocks.contains(stock));
+            assertThat(extractedStocks.contains(stock2));
         }
     }
 
@@ -271,6 +267,51 @@ public class StockRepositoryTest {
 
             // Then
             assertThat(totalStoreValue).isEqualTo(0);
+        }
+    }
+
+    @Nested
+    class Test_getStoreStockByType {
+
+        @Test
+        void whenNoStoreWithThatId_thenThrowsException() throws Exception {
+            // Given
+            Integer storeId = 1000;
+            String requestedType = "Fruit";
+
+            // When & Then
+            assertThrows(ModelNotFoundException.class, () -> {
+                stockRepository.getStoreStockByType(storeId, requestedType);
+            });
+        }
+
+        @Test
+        void whenStoreExists_thenReturnsTheStock() throws Exception {
+            // Given
+            int storeId = 1;
+            int stockId = 1;
+            int stock2Id = 2;
+            int stock3Id = 3;
+
+            Store store = new Store(storeId, "Carrefour");
+            insertStore(store);
+            Stock stock = new Stock(stockId, "Poire", "Fruit", 50, storeId);
+            insertStock(stock);
+            Stock stock2 = new Stock(stock2Id, "Pomme", "Fruit", 49, storeId);
+            insertStock(stock2);
+            Stock stock3 = new Stock(stock3Id, "Pomme", "Nail", 49, storeId);
+            insertStock(stock3);
+
+            String requestedType = "Fruit";
+
+            // When
+            List<Stock> extractedStocks = stockRepository.getStoreStockByType(storeId, requestedType);
+
+            // Then
+            assertThat(extractedStocks).isNotEmpty();
+            assertThat(extractedStocks.size()).isEqualTo(2);
+            assertThat(extractedStocks.contains(stock));
+            assertThat(extractedStocks.contains(stock2));
         }
     }
 
