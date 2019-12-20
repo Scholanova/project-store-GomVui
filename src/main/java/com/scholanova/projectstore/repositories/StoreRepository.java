@@ -2,7 +2,9 @@ package com.scholanova.projectstore.repositories;
 
 import com.scholanova.projectstore.exceptions.ModelNotFoundException;
 import com.scholanova.projectstore.exceptions.StoreNotFoundException;
+import com.scholanova.projectstore.models.Stock;
 import com.scholanova.projectstore.models.Store;
+import com.scholanova.projectstore.models.StoreWithTotalValue;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -12,6 +14,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -72,5 +75,20 @@ public class StoreRepository {
         if (totalAffectedRows == 0){
             throw new StoreNotFoundException();
         }
+    }
+
+    public List<StoreWithTotalValue> getStoreWithMinimumStockValue(int minimumStoreValue) throws ModelNotFoundException {
+        String query = "select * from (select sr.id, sr.name, sum(st.value)" +
+                " as total from stores sr left join stock st on st.storeid = sr.id group by sr.id) t where t.total >= :minimumStoreValue";
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("minimumStoreValue", minimumStoreValue);
+
+        List<StoreWithTotalValue> storeList = jdbcTemplate.query(query,
+                parameters,
+                new BeanPropertyRowMapper<>(StoreWithTotalValue.class));
+
+        return jdbcTemplate.query(query,
+                parameters,
+                new BeanPropertyRowMapper<>(StoreWithTotalValue.class));
     }
 }

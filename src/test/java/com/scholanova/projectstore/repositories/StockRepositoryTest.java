@@ -79,9 +79,8 @@ public class StockRepositoryTest {
             Integer storeId = 1000;
 
             // When & Then
-            assertThrows(ModelNotFoundException.class, () -> {
-                stockRepository.listStocksByStoreId(storeId);
-            });
+            List<Stock> extractedStocks = stockRepository.listStocksByStoreId(storeId);
+            assertThat(extractedStocks).isEmpty();
         }
 
         @Test
@@ -104,8 +103,8 @@ public class StockRepositoryTest {
             // Then
             assertThat(extractedStocks).isNotEmpty();
             assertThat(extractedStocks.size()).isEqualTo(2);
-            assertThat(extractedStocks.contains(stock));
-            assertThat(extractedStocks.contains(stock2));
+            assertThat(extractedStocks.get(0).getName()).isEqualTo(stock.getName());
+            assertThat(extractedStocks.get(1).getName()).isEqualTo(stock2.getName());
         }
     }
 
@@ -310,8 +309,8 @@ public class StockRepositoryTest {
             // Then
             assertThat(extractedStocks).isNotEmpty();
             assertThat(extractedStocks.size()).isEqualTo(2);
-            assertThat(extractedStocks.contains(stock));
-            assertThat(extractedStocks.contains(stock2));
+            assertThat(extractedStocks.get(0).getName()).isEqualTo(stock.getName());
+            assertThat(extractedStocks.get(1).getName()).isEqualTo(stock2.getName());
         }
     }
 

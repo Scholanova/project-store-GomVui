@@ -63,9 +63,6 @@ public class StockRepository {
                 parameters,
                 new BeanPropertyRowMapper<>(Stock.class));
 
-        if (stocks.isEmpty()) {
-            throw new ModelNotFoundException();
-        }
         return jdbcTemplate.query(query,
                 parameters,
                 new BeanPropertyRowMapper<>(Stock.class));
